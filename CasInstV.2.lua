@@ -1,5 +1,5 @@
 local branch = "prog"
-local serverPath = "https://git.minecartchris.cc/minecartchris/CC-Casnio/raw/branch/main/" + branch
+local serverPath = "https://git.minecartchris.cc/minecartchris/CC-Casnio/raw/branch/main/" .. branch
 
 while true do 
     if fs.exists("startup.lua") then 

@@ -1,5 +1,6 @@
 -- This will install the selected program
-local serverPath = "https://git.astronand.dev/minecartchris/CC-Casnio/raw/branch/main/prog"
+local branch = "prog"
+local serverPath = "https://git.astronand.dev/minecartchris/CC-Casnio/raw/branch/main/" .. branch
 if fs.exists("startup.lua") then
     print("do you want to update existing file?")
     local A = io.read()

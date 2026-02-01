@@ -41,7 +41,15 @@ sleep(0.25)
 
 nfc = peripheral.wrap("bottom")
 
---os.pullEvent=os.pullEventRaw
+os.pullEvent= function(...)
+    while true do
+        local t = table.pack(os.pullEventRaw(...))
+        if t[1] ~= "terminate" then
+            return table.unpack(t,1,t.n)
+        end
+    end
+end
+
 if fs.exists("/disk/terminate") then
     error("Service mode active",2)
 end
@@ -76,7 +84,7 @@ print("what is your bet?")
 bet = tonumber(io.read())
 print("what is your guess 1 to 15?")
 userGess = tonumber(io.read())
-if not bet or bet > money then
+if not bet or bet > money or bet < 0 then
    print("You do not have enough funds or did not enter a bet.")
    sleep(3)
    shell.run("reboot")

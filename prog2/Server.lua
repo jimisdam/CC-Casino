@@ -107,7 +107,7 @@ local function deleteAccount(uuid)
 end
 
 local kromerNode = "https://kromer.reconnected.cc/api/krist"
-local pkey = "ca6e3fd34b6d1d0c2e86b64c0203e093e909acf26ac190f8bfbfdcd2d986d31c"
+local pkey = ""
 
 local commands = {}
 local function makeaddressbyte(byte)

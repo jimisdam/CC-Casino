@@ -1,4 +1,54 @@
 --slot2
+rednet.open("back")
+
+local function interactWithCard(userUUID, mode, money)
+    if mode == "updateBalance" then
+        rednet.broadcast({
+            uuid = userUUID,
+            amount = money,
+            type = "set"
+        }, "machineBalanceModifier")
+    end
+
+    if mode == "getBalance" then
+        local _, _, cardUUID = os.pullEvent("nfc_data")
+        rednet.broadcast({
+            card = cardUUID
+        }, "getAccountData")
+
+        while true do
+            local id, message = rednet.receive("server_response", 10)
+            if not id then
+                print("the server is down")
+                print("please ping @minecartchris")
+                sleep(30)
+                --shell.run("reboot")
+            end
+            if message.type == "account_data" and message.cardId == cardUUID then
+                local money = message.balance
+                local playerUUID = message.uuid
+                local username = message.username
+                return money, playerUUID, username
+            end
+
+        end
+    end
+end
+
+os.pullEvent= function(...)
+    while true do
+        local t = table.pack(os.pullEventRaw(...))
+        if t[1] ~= "terminate" then
+            return table.unpack(t,1,t.n)
+        end
+    end
+end
+
+if fs.exists("/disk/terminate") then
+    error("Service mode active",2)
+end
+
+
 math.randomseed(os.epoch("utc"))
 for i = 1, 5 do math.random() end
 
@@ -73,7 +123,16 @@ end
 
 local function run()
   term.clear()
+  print("Welcome to the Slot Machine!")
+  print("Please swipe your card to begin")
+  money, playerUUID, username = interactWithCard(nil, "getBalance", nil)
+
+  term.clear()
+  print("Welcome ".. username .." have fun!")
   local bet_input = input("Bet: ")
+  if money < bet_input then
+    print("please get more money or bet less as you can't bet more then you have")
+  end
   local final = draw()
   local current = {nil, nil, nil}
 
@@ -88,6 +147,8 @@ local function run()
 
   local w, h = term.getSize()
   term.setCursorPos(math.floor(w/2) - 6, math.floor(h/2) + 3)
+  money = money + winnings
+  interactWithCard(playerUUID, "updateBalance", money)
   print("WON: " .. winnings)
 
   for i = 1, 4 do

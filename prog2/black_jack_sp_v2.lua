@@ -262,6 +262,8 @@ while true do
     if not player_bet then
         print('\nNot a number')
         goto continue
+    elseif player_bet < 0 then
+        print('\nNice try.')
     elseif player_data.balance < player_bet then
         print('\nInsufficient amount')
         goto continue

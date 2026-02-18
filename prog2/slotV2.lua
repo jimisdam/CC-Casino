@@ -3,12 +3,12 @@ rednet.open("back")
 
 
 local function interactWithCard(userUUID, mode, money)
-if mode == "updateBalance" then
-  rednet.broadcast({
-    uuid = userUUID,
-    amount = money,
-    type = "set"
-  }, "machineBalanceModifier")
+  if mode == "updateBalance" then
+    rednet.broadcast({
+      uuid = userUUID,
+      amount = money,
+      type = "set"
+    }, "machineBalanceModifier")
   end
 
   if mode == "getBalance" then
@@ -36,23 +36,22 @@ if mode == "updateBalance" then
         local username = message.username
         return money, playerUUID, username
       end
-
     end
   end
 end
 
 
-os.pullEvent= function(...)
-    while true do
-        local t = table.pack(os.pullEventRaw(...))
-        if t[1] ~= "terminate" then
-            return table.unpack(t,1,t.n)
-        end
+os.pullEvent = function(...)
+  while true do
+    local t = table.pack(os.pullEventRaw(...))
+    if t[1] ~= "terminate" then
+      return table.unpack(t, 1, t.n)
     end
+  end
 end
 
 if fs.exists("/disk/terminate") then
-    error("Service mode active",2)
+  error("Service mode active", 2)
 end
 
 
@@ -83,7 +82,7 @@ local function calculate_winnings(got, b)
 end
 
 local function draw()
-  local letters = {'', '', '', ' '}
+  local letters = { '', '', '', ' ' }
   local got = {}
   for i = 1, 3 do
     table.insert(got, letters[random(1, #letters)])
@@ -107,7 +106,7 @@ local function draw_display(display)
 end
 
 local function spin(current_got)
-  local letters = {'', '', '', ' '}
+  local letters = { '', '', '', ' ' }
   local delay = 0.05
   for i = 1, 12 do
     local display = {}
@@ -135,14 +134,17 @@ local function run()
   money, playerUUID, username = interactWithCard(nil, "getBalance", nil)
 
   term.clear()
-  print("Welcome ".. username .." have fun!")
+  print("Welcome " .. username .. " have fun!")
   local bet_input = tonumber(input("Bet: "))
   if money < bet_input then
     print("please get more money or bet less as you can't bet more then you have")
     return
+  elseif bet_input < 0 then
+    print("Nice try.")
+    return
   end
   local final = draw()
-  local current = {nil, nil, nil}
+  local current = { nil, nil, nil }
 
   for i = 1, 3 do
     spin(current)
@@ -154,14 +156,14 @@ local function run()
   local winnings = calculate_winnings(final, bet_input)
 
   local w, h = term.getSize()
-  term.setCursorPos(math.floor(w/2) - 6, math.floor(h/2) + 3)
+  term.setCursorPos(math.floor(w / 2) - 6, math.floor(h / 2) + 3)
   money = money + winnings
   interactWithCard(playerUUID, "updateBalance", money)
   print("WON: " .. winnings)
 
   for i = 1, 4 do
     sleep(0.3)
-    term.setCursorPos(math.floor(w/2) - 5, math.floor(h/2))
+    term.setCursorPos(math.floor(w / 2) - 5, math.floor(h / 2))
     term.write("           ")
     sleep(0.3)
     draw_display(final)

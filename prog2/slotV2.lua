@@ -78,7 +78,7 @@ local function calculate_winnings(got, b)
   elseif got[1] == got[2] or got[2] == got[3] or got[1] == got[3] then
     return b
   else
-    return 0
+    return -b
   end
 end
 
